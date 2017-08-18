@@ -9,12 +9,15 @@ public class PrimeFinderThread extends Thread{
 	int a,b;
 	
 	private List<Integer> primes;
+        
+        boolean dormir;
 	
 	public PrimeFinderThread(int a, int b) {
 		super();
                 this.primes = new LinkedList<>();
 		this.a = a;
 		this.b = b;
+                dormir = false;
 	}
 
         @Override
@@ -22,10 +25,23 @@ public class PrimeFinderThread extends Thread{
             for (int i= a;i < b;i++){						
                 if (isPrime(i)){
                     primes.add(i);
-                    System.out.println(i);
+                }
+                if(dormir){
+                    synchronized(Control.obj){
+                        try{
+                            Control.obj.wait();
+                        }catch(InterruptedException e){
+                            System.out.println("Algo esta mal");
+                        }
+                    }
                 }
             }
 	}
+        
+        void changeDormir(){
+            if(!dormir)dormir=true;
+            else dormir = false;
+        }
 	
 	boolean isPrime(int n) {
 	    boolean ans;
